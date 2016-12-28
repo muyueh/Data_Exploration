@@ -48,41 +48,9 @@ ggplot(subset(tarantino, type=='word'), aes(reorder(movie, movie, function(x) le
 
 
 ```{r fig.width=5, fig.height=5}
-# tarantino %>% 
-# tarantino %>% filter(type=='word') %>% group_by(word) %>% summarise(word_count=count(word))
 
-# type(table(tarantino$word)
+ggplot(subset(tarantino, type=='word'), aes(reorder(word, word, function(x) length(x) ))) + geom_bar() + coord_flip()
 
-# tarantino %>% .(word)
-# %>% summarise
-
-# diamonds %>% group_by(clarity) %>% summarise(count=)
-
-# diamonds %>% group_by(clarity) %>% summarise(carat_median = median(carat), price_median = median(price))
-
-# tarantino %>% filter(word != '') %>%  group_by(movie, word) %>%  summarise(w_count=n()) 
-# %>% group_by(movie)
-# %>% group_by(movie) %>% top_n(10, wt=w_count)
-
-# %>% summarise(w_count=n()) %>% arrange(movie, desc( w_count))
-# %>% head
-
-# summary(tarantino)
-
-
-
-
-# ggplot(subset(tarantino, type=='word'), aes(reorder(word, word, function(x) length(x) ))) + geom_bar() + coord_flip()+ facet_wrap(~movie)
-
-
-
-
-
-# data$word_count
-
-# reorder(word, word, function(x) length(x) )
-
-# help(geom_bar)
 
 ```
 
