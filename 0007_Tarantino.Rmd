@@ -1,0 +1,173 @@
+---
+title: "Tarantino Day 7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Hypothesis
+- ~~Different word per Movie~~
+- Shift in words per Movie (color band on a time series)
+- Death Timeline
+- Death count
+
+## TODO
+- bar chart height match font size
+
+
+- starting time 08:40
+
+
+```{r}
+tarantino = read.table('./data/data/tarantino/tarantino.csv', header = TRUE,sep = ",")
+str(tarantino)
+tail(tarantino)
+```
+
+
+```{r fig.width=3, fig.height=9}
+ggplot(subset(tarantino, type=='word'), aes(reorder(word, word, function(x) length(x) ))) + geom_bar() + coord_flip()
+```
+
+
+
+```{r fig.width=3, fig.height=8}
+ggplot(subset(tarantino, type=='word'), aes(word)) + geom_bar() + coord_flip()
+```
+
+
+```{r fig.width=4, fig.height=2}
+ggplot(subset(tarantino, type=='word'), aes(reorder(movie, movie, function(x) length(x) ))) + geom_bar() + coord_flip()
+```
+
+
+
+```{r fig.width=5, fig.height=8}
+
+ggplot(subset(tarantino, type=='word'), aes(reorder(word, word, function(x) length(x) ))) + geom_bar() + coord_flip()
+
+
+```
+
+```{r}
+data = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n())  %>% arrange(desc(word_count)) %>% head
+
+
+ggplot(data, aes(reorder(word, word_count, function(x) print(x) ) , word_count)) + geom_col() + coord_flip()
+```
+
+
+
+
+```{r fig.width=7, fig.height=7}
+data = tarantino %>% filter(word != '') %>% group_by(movie, word) %>% summarise(word_count=n()) %>% top_n(5, wt=word_count)
+level = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n()) %>% arrange(word_count)
+data$word = factor(data$word, levels = level$word)
+ggplot(data, aes(word , word_count)) + geom_col() + coord_flip()+ facet_wrap(~movie)
+
+```
+
+
+```{r}
+data = tarantino %>% filter(movie == 'Pulp Fiction' & word == 'motherfucker')
+ggplot(data, aes(minutes_in, word )) + geom_point()
+```
+
+
+```{r}
+data = tarantino %>% filter(word != '') %>% filter(movie == 'Pulp Fiction')
+
+level = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n()) %>% arrange(word_count)
+data$word = factor(data$word, levels = level$word)
+
+top = tail(level)$word
+data = data %>% filter( word %in% top )
+ggplot(data, aes(minutes_in, word )) + geom_point(alpha = 0.3)
+```
+
+
+```{r}
+data = tarantino %>% filter(word != '')
+
+level = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n()) %>% arrange(word_count)
+data$word = factor(data$word, levels = level$word)
+
+top = tail(level)$word
+data = data %>% filter( word %in% top )
+ggplot(data, aes(minutes_in, word )) + geom_point(alpha = 0.2) + facet_wrap(~movie) + ggtitle('Word frequency during minutes of the movie')
+```
+
+
+
+```{r}
+data = tarantino %>% filter(word != '')
+
+level = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n()) %>% arrange(word_count)
+data$word = factor(data$word, levels = level$word)
+
+top = tail(level)$word
+data = data %>% filter( word %in% top )
+ggplot(data, aes(minutes_in, word)) + geom_point(alpha = 1, shape=124) + facet_wrap(~movie) + ggtitle('Word frequency during minutes of the movie')
+```
+
+
+
+
+
+```{r}
+data = tarantino
+
+levels(data$word) = c(levels(data$word), "Death")
+data$word[data$word == ''] = "Death"
+level = tarantino %>% filter(word != '') %>% group_by(word) %>% summarise(word_count=n()) %>% arrange(desc(word_count)) %>% head
+# level = c("Death", level)
+
+level
+# data$word = factor(data$word, levels = level$word)
+# 
+# top = tail(level)$word
+# data = data %>% filter( word %in% top )
+# ggplot(data, aes(minutes_in, word)) + geom_point(alpha = 1, shape=124) + facet_wrap(~movie) + ggtitle('Death + Word Distribution')
+```
+
+
+
+```{r}
+
+
+data = tarantino %>% filter(type == 'death')
+order =  data %>% group_by(movie) %>% summarise(deaths = n()) %>% arrange(deaths)
+data$movie = factor(data$movie, levels = order$movie)
+
+ggplot(data, aes(minutes_in, movie)) + geom_point(alpha = 0.2) + ggtitle("Death Count in Each Movie")
+
+
+```
+
+
+
+
+## Try to normalize movie length
+
+
+```{r}
+
+data = tarantino
+
+levels(data$word) = c(levels(data$word), "Death")
+data$word[data$word == ''] = "Death"
+
+data = data %>%
+  group_by(movie) %>%
+  mutate(percent = round(minutes_in / max(minutes_in) * 100) ) 
+
+
+p = ggplot(data, aes(percent, movie)) + geom_point(alpha = 0.2) + ggtitle("Word in black , death in red \n during the % progress of the movie")
+p + geom_point(data=(data %>% filter(word == 'Death') ), colour='red', shape=3)
+
+
+
+```

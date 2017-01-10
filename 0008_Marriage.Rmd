@@ -1,0 +1,179 @@
+---
+title: "Marriage Day 8"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Hypothesis
+- Getiing Married / Demographic
+- Getiing Devorced / Demographic
+
+
+`glimpse(men)`
+`men %>% select(-(1:3))`
+
+## TODO
+
+- starting time 09:00
+
+
+> Figures represent share of the relevant population that has never been married (MARST == 6 in the IPUMS data). Note that in the story, charts generally show the share that have ever been married, which is simply 1 - n.
+
+
+```{r}
+men = read.table('./data/data/marriage/men.csv', header = TRUE,sep = ",")
+str(men)
+colnames(men)
+glimpse(men)
+tail(men)
+```
+```{r}
+women = read.table('./data/data/marriage/women.csv', header = TRUE,sep = ",")
+str(women)
+tail(women)
+```
+
+
+
+
+```{r}
+both_sexes = read.table('./data/data/marriage/both_sexes.csv', header = TRUE,sep = ",")
+str(both_sexes)
+tail(both_sexes)
+```
+
+
+
+> In the divorce file, figures are share of the relevant population that is currently divorced, conditional on having ever been married.
+
+```{r}
+divorce = read.table('./data/data/marriage/divorce.csv', header = TRUE,sep = ",")
+str(divorce)
+tail(divorce)
+```
+
+
+
+```{r}
+
+menR = men
+menR[-(1:3)] = 1 - menR[-(1:3)]
+# menR %>% melt(id )
+
+
+womenR = women
+womenR[-(1:3)] = 1 - womenR[-(1:3)]
+womenR
+
+both_sexesR = both_sexes
+both_sexesR[-(1:3)] = 1 - both_sexesR[-(1:3)]
+both_sexesR
+
+```
+
+TODO
+- add start end
+
+```{r}
+ggplot(both_sexesR, aes(year, all_2534)) + geom_line()
+
+```
+
+
+```{r}
+
+both_sexesT = both_sexesR %>% gather(demographic, value, -c(X, year, date))
+menT = menR %>% gather(demographic, value, -c(X, year, date))
+womenT = womenR %>% gather(demographic, value, -c(X, year, date))
+
+# print(womenT)
+both_sexesT %>% ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+```{r}
+womenT %>% filter(demographic == 'all_3544') %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+```{r}
+womenT %>% filter(grepl('BAo', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+```{r}
+womenT %>% filter(grepl('^(BAo_2534|BAo_3544|BAo_4554)$', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+
+```{r}
+menT %>% filter(grepl('^(BAo_2534|BAo_3544|BAo_4554)$', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+```{r}
+both_sexesT %>% filter(grepl('^(BAo_2534|BAo_3544|BAo_4554)$', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+
+
+```{r}
+both_sexesT %>% filter(grepl('^(BAp_2534|BAp_3544|BAp_4554)$', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+```{r}
+both_sexesT %>% filter(grepl('^(all)', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+```{r}
+both_sexesT %>% filter(grepl('^(Black_2534|Black_3544|Black_4554)$', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+```
+
+
+
+
+```{r}
+
+
+
+
+  high = both_sexesT %>% filter(grepl('^(kids_mid_2534|kids_GD_2534)', demographic))
+
+
+
+
+
+l = both_sexesT %>% filter(grepl('^(kids_)', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line() + scale_color_manual(values = c(rep('grey', 9) ) )
+
+
+l + geom_line(data=high, colour='red', shape=3)
+
+
+# l  + geom_line(data=high) + scale_color_manual(values = rep('red', 9) )
+
+
+
+
+# l + geom_line(, colo)
+
+```
+
+
+```{r}
+
+menT %>% filter(grepl('BAo', demographic)) %>%  ggplot(aes(x=year, y=value, colour=demographic)) + geom_line()
+
+```
+
